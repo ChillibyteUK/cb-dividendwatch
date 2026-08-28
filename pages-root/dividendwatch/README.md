@@ -11,13 +11,14 @@ A self-contained JavaScript widget for exploring dividend payment data from a CS
 3. [Features](#features)
 4. [Multi-language support](#multi-language-support)
 5. [Customisation](#customisation)
-6. [Architecture](#architecture)
-7. [Deployment](#deployment)
-8. [Browser support](#browser-support)
-9. [Troubleshooting](#troubleshooting)
-10. [Performance](#performance)
-11. [Version history](#version-history)
-12. [Licence](#licence)
+6. [Extending the tool](#extending-the-tool)
+7. [Architecture](#architecture)
+8. [Deployment](#deployment)
+9. [Browser support](#browser-support)
+10. [Troubleshooting](#troubleshooting)
+11. [Performance](#performance)
+12. [Version history](#version-history)
+13. [Licence](#licence)
 
 ---
 
@@ -173,6 +174,54 @@ Handled by `fmt()` in `js/dividend-tool.js`. To change the format (e.g. a differ
 
 ---
 
+## Extending the tool
+
+Patterns that work with the tool as it stands today, for integrations beyond a plain `<script>` tag.
+
+### Embedding from a React/Vue component
+
+The tool is just a script tag with attributes — no special integration API needed. Inject it into a container element you control, using a ref:
+
+```jsx
+function DividendDashboard({ csvUrl, lang }) {
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = 'https://capitalgroup.fvenn.com/dividendwatch/js/dividend-tool.js';
+    script.dataset.csv = csvUrl;
+    if (lang) script.dataset.lang = lang;
+    containerRef.current.appendChild(script);
+    return () => {
+      containerRef.current.innerHTML = ''; // removes the script tag and the widget it inserted
+    };
+  }, [csvUrl, lang]);
+
+  return <div ref={containerRef} />;
+}
+```
+
+The tool inserts its Shadow DOM host as the next sibling after the script tag, so appending the script into the ref'd `<div>` places the widget inside it correctly.
+
+Shadow DOM isolation means the widget's styles can't clash with the rest of your component tree, and vice versa.
+
+### Embedding on a different domain
+
+The `_headers` file's CORS rules already allow the tool's JS, CSS, fonts, language files, and CSV to be fetched cross-origin, so a page on any domain can point a script `src`/`data-csv` at your Cloudflare Pages deployment directly (see [Deployment](#deployment) for the URL structure) — the page doesn't need to be served from the same domain as the tool itself.
+
+### Replacing the CSV with an API
+
+There's no built-in API mode, but the data-loading step is isolated to one `Papa.parse(csvUrl, {...})` call in `js/dividend-tool.js`. Two ways to swap in a different source, depending on what you control:
+
+- **Your API can return CSV text** — call `Papa.parse(csvText, { header: true, ... })` with the string directly instead of a URL (drop `download: true`).
+- **Your API returns JSON** — skip Papa Parse for the initial load and build the `rows` array yourself from the response, using the same shape each row currently has: `{ region, country, sector, subsector, year, quarter, dividend }`. Everything downstream (filtering, aggregation, charting) works against that array regardless of where it came from.
+
+### Mapping additional CSV column names
+
+The dividend column is already matched flexibly — any header containing "dividend" (case-insensitive) is normalised to `dividend` (see the column-normalisation loop near the top of the `Papa.parse` `complete` callback). If your CSV uses different names for the other columns (e.g. `territory` instead of `country`), add a similar rule in that same loop rather than renaming columns in the source file.
+
+---
+
 ## Architecture
 
 - **Pure vanilla JavaScript**, one file (`js/dividend-tool.js`), no framework, no build step
@@ -185,10 +234,11 @@ Handled by `fmt()` in `js/dividend-tool.js`. To change the format (e.g. a differ
 
 ## Deployment
 
-This repository is structured for deployment to Cloudflare Pages as a zip upload:
+This repository deploys to Cloudflare Pages automatically: pushing to `main` triggers a build and deploy, no manual upload step. The Cloudflare Pages project is configured with **Root directory** set to `pages-root`, matching this repo's layout:
 
 ```
 pages-root/
+  _headers
   dividendwatch/
     index.html
     js/dividend-tool.js
@@ -196,10 +246,11 @@ pages-root/
     lang/*.json
     data/*.csv
     fonts/*.woff2
-    _headers
 ```
 
-The `pages-root/` wrapper is discarded on upload, so the deployed tool is served from `/dividendwatch/`. `_headers` sets CORS, explicit UTF-8 charsets for `.js`/`.json` (needed because non-ASCII characters appear in the tool's own source, e.g. the ▶/▼ collapse icons and translated data), and a short cache lifetime on the CSV data.
+`_headers` must live at `pages-root/_headers` — Cloudflare Pages only reads it from the root of the configured output directory, not from a subfolder. With that root set to `pages-root`, the tool itself is served from `/dividendwatch/`. `_headers` sets CORS (needed so the tool can be embedded on other domains — see [Extending the tool](#extending-the-tool)), explicit UTF-8 charsets for `.js`/`.json` (needed because non-ASCII characters appear in the tool's own source, e.g. the ▶/▼ collapse icons and translated data), and a short cache lifetime on the CSV data.
+
+A manual zip upload to a Direct Upload project remains possible if ever needed — zip the contents of `pages-root/` (so `_headers` and `dividendwatch/` sit at the zip's top level) and upload as normal.
 
 ---
 
