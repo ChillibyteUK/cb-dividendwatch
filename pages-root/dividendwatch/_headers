@@ -2,3 +2,12 @@
   Access-Control-Allow-Origin: *
   Access-Control-Allow-Methods: GET, OPTIONS
   Access-Control-Allow-Headers: Content-Type
+
+/dividendwatch/js/*.js
+  Content-Type: text/javascript; charset=utf-8
+
+/dividendwatch/lang/*.json
+  Content-Type: application/json; charset=utf-8
+
+/dividendwatch/data/*
+  Cache-Control: public, max-age=300, must-revalidate

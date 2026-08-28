@@ -5,29 +5,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Capital Group Dividend Watch</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
-        @font-face {
-            font-family: 'AvenirLT';
-            src: url(./fonts/AvenirNextLTCom-Regular.woff2) format('woff2');
-            font-weight: normal;
-            font-style: normal;
-            font-display: swap;
-        }
-
-        body {
-            font-family: 'AvenirLT', monospace, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
+        /* Namespaced under .cg-dividend-demo so dropping this markup into a
+           real host page can't collide with the page's own ".container"/"h1"
+           styles. AvenirLT itself needs no @font-face here - the widget
+           registers it globally via the FontFace API in dividend-tool.js. */
+        .cg-dividend-demo {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 3rem 1rem;
+            font-family: 'AvenirLT', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
                 Arial, "Noto Sans", "Liberation Sans", sans-serif;
         }
 
-        h1 {
+        .cg-dividend-demo h1 {
             font-weight: 600;
         }
     </style>
 </head>
 
 <body>
-    <div class="container py-5">
+    <div class="cg-dividend-demo">
         <h1>Capital Group Dividend Watch</h1>
         <script src="./js/dividend-tool.js" data-csv="./data/Data-Extract.csv"></script>
     </div>

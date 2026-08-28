@@ -15,21 +15,10 @@
   --chart-grid: #e8e8e8;
 }
 
-@font-face {
-  font-family: 'AvenirLT';
-  src: url(/fonts/AvenirNextLTCom-Regular.woff2) format('woff2');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'AvenirLT';
-  src: url(/fonts/AvenirNextLTCom-Demi.woff2) format('woff2');
-  font-weight: 600;
-  font-style: normal;
-  font-display: swap;
-}
+/* AvenirLT is registered via the FontFace API in dividend-tool.js, using a
+   path resolved relative to the script's own URL (works regardless of the
+   deployment subpath). document.fonts is shared with the host document, so
+   no @font-face declaration is needed here - one loading strategy only. */
 
 *,
 *::before,
@@ -102,6 +91,32 @@ select {
 button {
   font-family: 'AvenirLT', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
     Arial, "Noto Sans", "Liberation Sans", sans-serif;
+}
+
+/* Reset default button chrome for controls styled to look like text links
+   (add/remove dataset, chart data toggle) while keeping real button
+   semantics for keyboard/screen-reader accessibility. */
+.link-button {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  color: var(--button-hover);
+  font-size: 14px;
+  user-select: none;
+}
+
+.link-button:focus-visible {
+  outline: 2px solid var(--button);
+  outline-offset: 2px;
+}
+
+.chart-data-toggle {
+  display: block;
+  font-weight: 600;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
 }
 
 select:focus {
@@ -254,73 +269,6 @@ th:first-child {
 
 .date-range-display-container button {
   justify-self: start;
-}
-
-/* info icons and popovers */
-.info-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 16px;
-  height: 16px;
-  margin-left: 6px;
-  background: #ffffff;
-  border-radius: 50%;
-  color: #666;
-  border: 1px solid #666;
-  font-size: 11px;
-  font-weight: bold;
-  cursor: pointer;
-  user-select: none;
-}
-
-.info-icon:hover {
-  background: #ccc;
-}
-
-.popover {
-  background: #333;
-  color: white;
-  padding: 8px 12px;
-  border-radius: 6px;
-  font-size: 12px;
-  max-width: 200px;
-  z-index: 1000;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.popover-arrow,
-.popover-arrow::before {
-  position: absolute;
-  width: 8px;
-  height: 8px;
-  background: inherit;
-}
-
-.popover-arrow {
-  visibility: hidden;
-}
-
-.popover-arrow::before {
-  visibility: visible;
-  content: '';
-  transform: rotate(45deg);
-}
-
-.popover[data-popper-placement^='top']>.popover-arrow {
-  bottom: -4px;
-}
-
-.popover[data-popper-placement^='bottom']>.popover-arrow {
-  top: -4px;
-}
-
-.popover[data-popper-placement^='left']>.popover-arrow {
-  right: -4px;
-}
-
-.popover[data-popper-placement^='right']>.popover-arrow {
-  left: -4px;
 }
 
 /* radio groups styling */
