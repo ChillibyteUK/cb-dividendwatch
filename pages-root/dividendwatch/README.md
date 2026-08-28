@@ -32,12 +32,17 @@ A self-contained JavaScript widget for exploring dividend payment data from a CS
 </head>
 <body>
   <h1>Dividend Dashboard</h1>
-  <script src="js/dividend-tool.js" data-csv="data/Data-Extract.csv"></script>
+  <script
+    src="https://capitalgroup.fvenn.com/dividendwatch/js/dividend-tool.js"
+    data-csv="https://capitalgroup.fvenn.com/dividendwatch/data/Data-Extract.csv">
+  </script>
 </body>
 </html>
 ```
 
-The script inserts the widget immediately after itself in the DOM. No build step, no bundler, no other markup required.
+The script inserts the widget immediately after itself in the DOM. No build step, no bundler, no other markup required. This tool is centrally hosted at `capitalgroup.fvenn.com` — any page, on any domain, embeds it from that one URL rather than hosting its own copy (this is also why `_headers` grants cross-origin access; see [Extending the tool](#extending-the-tool)).
+
+If you're running your own separate deployment instead (e.g. local development, or a fork), relative paths work too as long as `index.html` sits alongside `js/`, `css/`, and `data/` — e.g. `<script src="js/dividend-tool.js" data-csv="data/Data-Extract.csv">`.
 
 ### Script attributes
 
@@ -91,7 +96,11 @@ Rows aren't dropped if a value doesn't fit these formats — an unparseable divi
 Set `data-lang` on the script tag to display the widget in a supported language:
 
 ```html
-<script src="js/dividend-tool.js" data-csv="data/Data-Extract.csv" data-lang="de"></script>
+<script
+  src="https://capitalgroup.fvenn.com/dividendwatch/js/dividend-tool.js"
+  data-csv="https://capitalgroup.fvenn.com/dividendwatch/data/Data-Extract.csv"
+  data-lang="de">
+</script>
 ```
 
 Currently shipped: `de` (German), `it` (Italian), `es` (Spanish), `nl` (Dutch), `zh` (Chinese). English needs no language file — omit `data-lang`, or the string content of the tool itself is the English text.
