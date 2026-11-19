@@ -156,6 +156,7 @@
             "Media & Telecommunications": "Media & Telcos"
           },
           region: {
+            "Uk": "UK",
             "Pacific Ex China, Hong Kong & Japan": "Pacific Ex China, HK & Japan",
           },
           country: {
